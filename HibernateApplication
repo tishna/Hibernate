@@ -1,0 +1,69 @@
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.AnnotationConfiguration;
+import org.hibernate.cfg.Configuration;
+
+public class DBConnection {
+
+    private static final SessionFactory sessionFactory = buildSessionFactory();
+    private static DBConnectionManager oDBConnectionManager;
+
+    private DBConnectionManager() {
+    }
+    
+
+    private static SessionFactory buildSessionFactory() {
+        try {
+            return new AnnotationConfiguration().configure().buildSessionFactory();
+        } catch (Throwable ex) {
+            throw new ExceptionInInitializerError(ex);
+        }
+
+    }
+    public static DBConnectionManager getInstance() {
+        if (oDBConnectionManager == null) {
+
+            if (oDBConnectionManager == null) {
+                oDBConnectionManager = new DBConnectionManager();
+            }
+
+        }
+        return oDBConnectionManager;
+    }
+
+    public static SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
+    public static Session getSession() throws HibernateException, Exception {
+        Session session = getSessionFactory().openSession();
+        return session;
+    }
+
+
+    
+    public static Transaction getTransaction(Session session)
+            throws HibernateException, Exception {
+        Transaction transaction = session.beginTransaction();
+        return transaction;
+    }
+
+
+    
+    public static boolean closeConnection(Session session) throws HibernateException,
+            Exception {
+        session.flush();
+        session.close();
+        return true;
+    }
+
+    
+    public static boolean closeFactory() throws HibernateException,
+            Exception {
+
+        sessionFactory.close();
+        return true;
+    }
+}
